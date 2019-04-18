@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="crux.Token"/>
+<fullyQualifiedTypeName name="java.io.IOException"/>
+<fullyQualifiedTypeName name="ast.AddressOf"/>
+<fullyQualifiedTypeName name="ast.Command"/>
+<fullyQualifiedTypeName name="ast.CommandVisitor"/>
+<fullyQualifiedTypeName name="ast.Dereference"/>
+<fullyQualifiedTypeName name="ast.ExpressionList"/>
+<fullyQualifiedTypeName name="ast.VariableDeclaration"/>
+<fullyQualifiedTypeName name="ast.ArrayDeclaration"/>
+<fullyQualifiedTypeName name="ast.Declaration"/>
+<fullyQualifiedTypeName name="ast.Assignment"/>
+<fullyQualifiedTypeName name="ast.Call"/>
+<fullyQualifiedTypeName name="ast.IfElseBranch"/>
+<fullyQualifiedTypeName name="ast.WhileLoop"/>
+<fullyQualifiedTypeName name="ast.Return"/>
+<fullyQualifiedTypeName name="ast.Statement"/>
+<fullyQualifiedTypeName name="ast.StatementList"/>
+<fullyQualifiedTypeName name="ast.FunctionDefinition"/>
+<fullyQualifiedTypeName name="ast.Expression"/>
+<fullyQualifiedTypeName name="crux.Token.Kind"/>
+<fullyQualifiedTypeName name="ast.DeclarationList"/>
+<fullyQualifiedTypeName name="crux.Symbol"/>
+<fullyQualifiedTypeName name="types.VoidType"/>
+<fullyQualifiedTypeName name="types.IntType"/>
+<fullyQualifiedTypeName name="ast.LiteralBool"/>
+<fullyQualifiedTypeName name="ast.LiteralBool.Value"/>
+<fullyQualifiedTypeName name="types.BoolType"/>
+<fullyQualifiedTypeName name="java.util.Arrays"/>
+<fullyQualifiedTypeName name="ast.Comparison"/>
+<fullyQualifiedTypeName name="ast.Comparison.Operation"/>
+</qualifiedTypeNameHistroy>

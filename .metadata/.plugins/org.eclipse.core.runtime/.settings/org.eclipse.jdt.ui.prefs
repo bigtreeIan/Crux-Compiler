@@ -1,0 +1,22 @@
+content_assist_disabled_computers=org.eclipse.jdt.ui.textProposalCategory\u0000org.eclipse.recommenders.calls.rcp.proposalCategory.templates\u0000org.eclipse.mylyn.java.ui.javaAllProposalCategory\u0000org.eclipse.jdt.ui.javaAllProposalCategory\u0000org.eclipse.jdt.ui.javaTypeProposalCategory\u0000org.eclipse.jdt.ui.javaNoTypeProposalCategory\u0000org.eclipse.recommenders.chain.rcp.proposalCategory.chain\u0000
+content_assist_lru_history=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><history maxLHS\="100" maxRHS\="10"><lhs name\="java.lang.Enum"><rhs name\="crux.Token$Kind"/><rhs name\="ast.LiteralBool$Value"/></lhs><lhs name\="crux.Token$Kind"><rhs name\="crux.Token$Kind"/></lhs><lhs name\="ast.Visitable"><rhs name\="ast.ExpressionList"/><rhs name\="ast.VariableDeclaration"/><rhs name\="ast.ArrayDeclaration"/><rhs name\="ast.DeclarationList"/><rhs name\="ast.Assignment"/><rhs name\="ast.IfElseBranch"/><rhs name\="ast.WhileLoop"/><rhs name\="ast.Return"/><rhs name\="ast.StatementList"/><rhs name\="ast.FunctionDefinition"/></lhs><lhs name\="ast.Expression"><rhs name\="ast.AddressOf"/><rhs name\="ast.Dereference"/><rhs name\="ast.Call"/></lhs><lhs name\="ast.Statement"><rhs name\="ast.Call"/><rhs name\="ast.VariableDeclaration"/><rhs name\="ast.ArrayDeclaration"/><rhs name\="ast.Assignment"/><rhs name\="ast.IfElseBranch"/><rhs name\="ast.WhileLoop"/><rhs name\="ast.Return"/></lhs><lhs name\="ast.Command"><rhs name\="ast.ExpressionList"/><rhs name\="ast.VariableDeclaration"/><rhs name\="ast.ArrayDeclaration"/><rhs name\="ast.DeclarationList"/><rhs name\="ast.Assignment"/><rhs name\="ast.IfElseBranch"/><rhs name\="ast.WhileLoop"/><rhs name\="ast.Return"/><rhs name\="ast.StatementList"/><rhs name\="ast.FunctionDefinition"/></lhs><lhs name\="ast.Call"><rhs name\="ast.Call"/></lhs><lhs name\="java.lang.Iterable"><rhs name\="ast.ExpressionList"/><rhs name\="ast.DeclarationList"/><rhs name\="ast.StatementList"/></lhs><lhs name\="ast.ExpressionList"><rhs name\="ast.ExpressionList"/></lhs><lhs name\="ast.Declaration"><rhs name\="ast.VariableDeclaration"/><rhs name\="ast.ArrayDeclaration"/><rhs name\="ast.FunctionDefinition"/></lhs><lhs name\="ast.VariableDeclaration"><rhs name\="ast.VariableDeclaration"/></lhs><lhs name\="ast.ArrayDeclaration"><rhs name\="ast.ArrayDeclaration"/></lhs><lhs name\="ast.FunctionDefinition"><rhs name\="ast.FunctionDefinition"/></lhs><lhs name\="ast.DeclarationList"><rhs name\="ast.DeclarationList"/></lhs><lhs name\="ast.Assignment"><rhs name\="ast.Assignment"/></lhs><lhs name\="ast.StatementList"><rhs name\="ast.StatementList"/></lhs><lhs name\="ast.IfElseBranch"><rhs name\="ast.IfElseBranch"/></lhs><lhs name\="ast.WhileLoop"><rhs name\="ast.WhileLoop"/></lhs><lhs name\="ast.Return"><rhs name\="ast.Return"/></lhs><lhs name\="types.Type"><rhs name\="types.VoidType"/><rhs name\="types.IntType"/><rhs name\="types.BoolType"/></lhs><lhs name\="ast.LiteralBool$Value"><rhs name\="ast.LiteralBool$Value"/></lhs></history>
+content_assist_number_of_computers=24
+content_assist_proposals_background=255,255,255
+content_assist_proposals_foreground=0,0,0
+eclipse.preferences.version=1
+fontPropagated=true
+markOccurrences=false
+org.eclipse.jdt.internal.ui.navigator.layout=2
+org.eclipse.jdt.ui.editor.tab.width=
+org.eclipse.jdt.ui.formatterprofiles.version=12
+org.eclipse.jdt.ui.javadoclocations.migrated=true
+org.eclipse.jdt.ui.text.code_templates_migrated=true
+org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+org.eclipse.jdt.ui.text.custom_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+org.eclipse.jdt.ui.text.templates_migrated=true
+org.eclipse.jface.textfont=1|Monaco|11.0|0|COCOA|1|;
+proposalOrderMigrated=true
+spelling_locale_initialized=true
+tabWidthPropagated=true
+useAnnotationsPrefPage=true
+useQuickDiffPrefPage=true

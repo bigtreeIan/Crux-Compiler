@@ -1,0 +1,358 @@
+package mips;
+
+import java.util.regex.Pattern;
+
+import ast.*;
+import types.*;
+
+public class CodeGen implements ast.CommandVisitor {
+    
+    private StringBuffer errorBuffer = new StringBuffer();
+    private TypeChecker tc;
+    private Program program;
+    private ActivationRecord currentFunction;
+    private String reg = "$t0";
+    private String freg = "$f0";
+	Type voidType = new types.VoidType();
+	Type intType = new types.IntType();
+	Type floatType = new types.FloatType();
+	Type boolType = new types.BoolType();
+    public boolean mainFunc;
+    
+    //check if the function is main;
+    public boolean checkMainFunction(){
+    	if("main" == "main"){
+    		return true;
+    	}
+    	return false;
+    }
+    /*********************************************************************/
+    public CodeGen(TypeChecker tc)
+    {
+        this.tc = tc;
+        this.program = new Program();
+        //give program a mutator that gives them a beta
+        program.setCg(this);
+    }
+    
+    public boolean hasError()
+    {
+        return errorBuffer.length() != 0;
+    }
+    
+    public String errorReport()
+    {
+        return errorBuffer.toString();
+    }
+
+    private class CodeGenException extends RuntimeException
+    {
+        private static final long serialVersionUID = 1L;
+        public CodeGenException(String errorMessage) {
+            super(errorMessage);
+        }
+    }
+    
+    public boolean generate(Command ast)
+    {
+        try {
+            currentFunction = ActivationRecord.newGlobalFrame();
+            ast.accept(this);
+            return !hasError();
+        } catch (CodeGenException e) {
+            return false;
+        }
+    }
+    
+    public Program getProgram()
+    {
+        return program;
+    }
+
+    @Override
+    public void visit(ExpressionList node) {
+    	for(Expression expr : node){
+    		expr.accept(this);
+    	}
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(DeclarationList node) {
+    	for(Declaration dl : node){
+    		dl.accept(this);
+    	}
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(StatementList node) {
+    	for(Statement st : node){
+    		st.accept(this);
+    		if(st instanceof Call){
+    			Type returnType = tc.getType((Call) st);
+    			if(returnType.equivalent(voidType) == false &&
+    					(returnType.equivalent(intType) || returnType.equivalent(boolType)) 
+    			  ){
+   					program.popInt(reg);
+   				}
+    			if(returnType.equivalent(voidType) == false &&
+    					returnType.equivalent(floatType)){
+    				program.popFloat(reg);
+    			}
+    		}
+    	}
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(AddressOf node) {
+    	crux.Symbol sb = node.symbol();
+    	currentFunction.getAddress(program, reg, sb);
+    	program.pushInt(reg);
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(LiteralBool node) {
+    	ast.LiteralBool.Value boolValue = node.value();
+    	if(boolValue == ast.LiteralBool.Value.FALSE){
+    		program.appendInstruction("li $t0, 0");
+    		program.pushInt(reg);
+    	}
+    	else if(boolValue == ast.LiteralBool.Value.TRUE){
+    		program.appendInstruction("li $t0, 1");
+    		program.pushInt(reg);
+    	}
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(LiteralFloat node) {
+    	program.appendInstruction("li.s $f0, " + node.value());
+    	program.pushFloat(freg);
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(LiteralInt node) {
+    	program.appendInstruction("li $t0, " + node.value());
+    	program.pushInt(reg);
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(VariableDeclaration node) {
+        throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(ArrayDeclaration node) {
+        throw new RuntimeException("Implement this");
+    }
+
+    private String funcLabel;
+    
+    @Override
+    public void visit(FunctionDefinition node) {
+    	//new AR that links to its parents
+    	currentFunction = new ActivationRecord(node, currentFunction);
+    	node.body().accept(this);
+    	int frameSize = currentFunction.stackSize();
+        // Insert a function prologue at position pos
+    	String funcName = node.symbol().name();
+        //System.out.println(funcName);
+        int insertPos;
+		insertPos = program.appendInstruction(funcName + ":") + 1;
+		/*
+        if(funcName.equals("main")){
+            //System.out.println(funcName);
+    		insertPos = program.appendInstruction(funcName + ":") + 1;
+        }
+        else{
+            System.out.println(funcName);
+    		insertPos = program.appendInstruction("cruxfunc." + funcName + ":") + 1;
+        }
+        */
+    	node.body().accept(this);
+    	program.insertPrologue(insertPos, frameSize);
+    	funcLabel = program.newLabel();
+        //System.out.println(funcLabel);
+    	program.appendInstruction(funcLabel + ":");
+    	if((tc.getType(node) instanceof IntType || tc.getType(node) instanceof BoolType) && 
+    			tc.getType(node).equivalent(voidType) == false){
+    		program.popInt("$v0");
+    	}
+    	if(tc.getType(node) instanceof FloatType && tc.getType(node).equivalent(voidType) == false){
+    		program.popFloat("$v0");
+    	}
+    	program.appendEpilogue(frameSize);
+    	currentFunction = currentFunction.parent();
+    	
+    	if(funcName.equals("main")){
+    		mainFunc = true;
+    	}
+    	else{
+    		mainFunc = false;
+    	}
+        System.out.println(mainFunc);
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(Addition node) {
+        throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(Subtraction node) {
+        throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(Multiplication node) {
+        throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(Division node) {
+        throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(LogicalAnd node) {
+    	Expression leftSide = node.leftSide();
+    	leftSide.accept(this);
+    	program.popInt("$t0");
+    	Expression rightSide = node.rightSide();
+    	rightSide.accept(this);
+    	program.popInt("$t1");
+    	program.appendInstruction("and $t2, $t0, $t1");
+    	//store the result register
+    	program.pushInt("$t2");
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(LogicalOr node) {
+    	Expression leftSide = node.leftSide();
+    	leftSide.accept(this);
+    	program.popInt("$t0");
+    	Expression rightSide = node.rightSide();
+    	rightSide.accept(this);
+    	program.popInt("$t1");
+    	program.appendInstruction("and $t2, $t0, $t1");
+    	//store the result register
+    	program.pushInt("$t2");
+        //throw new RuntimeException("Implement this");
+    }
+    
+    @Override
+    public void visit(LogicalNot node) {
+    	Expression not_body = node.expression();
+    	not_body.accept(this);
+    	program.popInt("$t0");
+    	program.appendInstruction("beqz $t0, " + program.newLabel());
+    	program.appendInstruction("li $t1, 0");
+    	program.appendInstruction("b " + program.newLabel());
+    	program.appendInstruction(program.newLabel() + ":");
+    	program.appendInstruction("li $t1, 1");
+    	program.appendInstruction(program.newLabel() + ":");
+    	program.pushInt("$t1");
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(Comparison node) {
+        throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(Dereference node) {
+    	node.expression().accept(this);
+    	program.popInt("$t0");
+    	if(tc.getType(node).equivalent(new IntType()) || tc.getType(node).equivalent(new BoolType())){
+    		program.appendInstruction("lw $t1, 0($t0)");
+    		program.pushInt("$t1");
+    	}
+    	else if(tc.getType(node).equivalent(new FloatType()) == true){
+    		program.appendInstruction("lwc $f0, 0($t0)");
+    		program.pushFloat("$f0");
+    	}
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(Index node) {
+    	Expression nodeBase = node.base();
+    	nodeBase.accept(this);
+    	program.popInt("$t0");
+    	Expression nodeAmount = node.amount();
+    	nodeAmount.accept(this);
+    	program.popInt("$t1");
+    	program.appendInstruction("li $t2, " + ActivationRecord.numBytes(tc.getType(node)));
+    	program.appendInstruction("mul $t3, $t0, $t2");
+    	program.appendInstruction("add $t4, $t1, $t3");
+    	program.pushInt("$t4");
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(Assignment node) {
+        throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(Call node) {
+ 		node.arguments().accept(this);
+
+         String funcName =  node.function().name();
+         if (!funcName.matches("print(Bool|Float|Int|ln)|read(Float|Int)")) {
+         	funcName = "cruxfunc." + funcName;
+         } else {
+         	funcName = "func." + funcName;
+         }
+         program.appendInstruction("jal " + funcName);
+
+         if (node.arguments().size() > 0) {
+         	int argSize = 0;
+         	for (Expression expr : node.arguments()) {
+ 				Type type = tc.getType((Command) expr);
+         		argSize += numBytes(type);
+         	}
+ 			program.appendInstruction("addi $sp, $sp, " + argSize);
+         }
+
+ 		FuncType func = (FuncType) node.function().type();
+  		if (!func.returnType().equivalent(new VoidType())) {
+ 			program.appendInstruction("subu $sp, $sp, 4");
+ 			program.appendInstruction("sw $v0, 0($sp)");
+  		}
+
+     }
+        //throw new RuntimeException("Implement this");
+
+    @Override
+    public void visit(IfElseBranch node) {
+        throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(WhileLoop node) {
+        throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(Return node) {
+    	node.argument().accept(this);
+    	program.appendInstruction("b " + funcLabel);
+        //throw new RuntimeException("Implement this");
+    }
+
+    @Override
+    public void visit(ast.Error node) {
+        String message = "CodeGen cannot compile a " + node;
+        errorBuffer.append(message);
+        throw new CodeGenException(message);
+    }
+}

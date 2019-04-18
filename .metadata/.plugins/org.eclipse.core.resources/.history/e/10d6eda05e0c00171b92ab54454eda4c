@@ -1,0 +1,131 @@
+
+    @Override
+    public void visit(Dereference node) {
+        node.expression().accept(this);
+        program.popInt("$t0"); 
+        Type type = tc.getType(node);
+        if (type.equivalent(new FloatType())) {
+            program.appendInstruction("lwc1 $f0, 0($t0)");
+            program.pushFloat("$f0");
+        } else {
+            program.appendInstruction("lw $t1, 0($t0)");
+            program.pushInt("$t1");
+        } 
+    }
+
+    @Override
+    public void visit(Index node) {
+        node.base().accept(this);
+        node.amount().accept(this);
+        program.popInt("$t0");
+        program.popInt("$t1");
+
+        Type type = tc.getType(node);
+        program.appendInstruction("li $t2, " + ActivationRecord.numBytes(type));
+        program.appendInstruction("mul $t3, $t0, $t2");
+        program.appendInstruction("add $t4, $t1, $t3");
+        program.pushInt("$t4");
+    }
+
+    @Override
+    public void visit(Assignment node) {
+        node.destination().accept(this);
+    	node.source().accept(this);
+    	Type type = tc.getType(node);
+        if (type.equivalent(new FloatType())) {
+            program.popFloat("$f0");
+            program.popInt("$t0");
+            program.appendInstruction("swc1 $f0, 0($t0)");
+        } else {
+            program.popInt("$t0");
+            program.popInt("$t1"); 
+            program.appendInstruction("sw $t0, 0($t1)");
+        }
+    }
+
+    @Override
+    public void visit(Call node) {
+	node.arguments().accept(this);
+
+        String funcName =  node.function().name();
+        
+        if (isBuildinFunc(funcName)) {
+            funcName = "func." + funcName;
+        }else{
+            funcName = "cruxfunc." +funcName;
+        }
+        
+        program.appendInstruction("jal " + funcName);
+
+        if (node.arguments().size() > 0) {
+            int argSize = 0;
+            for (Expression expr : node.arguments()) {
+                Type type = tc.getType((Command) expr);
+                argSize += ActivationRecord.numBytes(type) ;
+            }
+            program.appendInstruction("addi $sp, $sp, " + argSize);
+        }
+
+        FuncType func = (FuncType) node.function().type();
+        if (!func.returnType().equivalent(new VoidType())) {
+            program.appendInstruction("subu $sp, $sp, 4");
+            program.appendInstruction("sw $v0, 0($sp)");
+        }
+    }
+
+    
+
+    @Override
+    public void visit(IfElseBranch node) {
+	String elseLabel = program.newLabel();
+    String thenLabel = program.newLabel();
+        
+    node.condition().accept(this);
+    program.popInt("$t7");
+    program.appendInstruction("beqz $t7, " + elseLabel);
+
+	node.thenBlock().accept(this);
+	program.appendInstruction("b " + thenLabel);
+                
+    	program.appendInstruction(elseLabel+ ":");
+	node.elseBlock().accept(this);
+    	program.appendInstruction(thenLabel+ ":");
+    }
+
+    @Override
+    public void visit(WhileLoop node) {
+        String conditionLabel = program.newLabel();
+        String joinLabel = program.newLabel();
+                
+    	program.appendInstruction(conditionLabel + ":");
+        node.condition().accept(this);
+        
+    	program.popInt("$t7");
+    	program.appendInstruction("beqz $t7, "+ joinLabel);
+
+    	node.body().accept(this);
+    	program.appendInstruction("b " + conditionLabel);
+    	program.appendInstruction(joinLabel+ ":");
+    }
+
+    @Override
+    public void visit(Return node) {
+        node.argument().accept(this);
+    	program.appendInstruction("b " + funcLabel);
+
+    }
+
+    @Override
+    public void visit(ast.Error node) {
+        String message = "CodeGen cannot compile a " + node;
+        errorBuffer.append(message);
+        throw new CodeGenException(message);
+    }
+    
+    
+    private boolean isBuildinFunc(String s){
+        return (s.equals("printBool") ||s.equals("printFloat")||s.equals("printInt")||s.equals("println")||
+                s.equals("readFloat")||s.equals("readInt") ) ;
+    
+    }
+}
